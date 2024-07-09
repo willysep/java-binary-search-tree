@@ -1,4 +1,8 @@
+
+import java.util.Objects;
+
 public class Tree {
+
     Node root;
 
     Tree(Integer[] list) {
@@ -44,7 +48,7 @@ public class Tree {
     }
 
     public void print(Node node) {
-        String result = "";
+        String result;
         if (node == null) {
             result = this.root.data.toString();
             result += rePrintString(root);
@@ -56,7 +60,11 @@ public class Tree {
     }
 
     private Node search(Integer data, Node node) {
-        if (node.data == data) {
+        if (node == null) {
+            return null;
+        }
+
+        if (Objects.equals(node.data, data)) {
             return node;
         }
 
@@ -73,25 +81,59 @@ public class Tree {
 
     public void searchNode(Integer data) {
         Node a = search(data, this.root);
-        if (a == null)
+        if (a == null) {
             System.out.println("Not Found");
-        else
+        } else {
             print(a);
+        }
     }
 
-    private Node delete(Integer data, Node node) {
-        if (node.data == data) {
+    public void insertNewNode(Integer data) {
+        insert(this.root, data);
+    }
+
+    private Node delete(Node node, Integer data) {
+        /* Base Case: If the tree is empty */
+        if (node == null) {
             return node;
         }
 
+        /* Otherwise, recur down the tree */
         if (data < node.data) {
-            return search(data, node.left);
+            node.left = delete(node.left, data);
+        } else if (data > node.data) {
+            node.right = delete(node.right, data);
+        } // if data is same as node's data, then This is the node 
+        // to be deleted 
+        else {
+            // node with only one child or no child 
+            if (node.left == null) {
+                return node.right;
+            } else if (node.right == null) {
+                return node.left;
+            }
+
+            // node with two children: Get the inorder successor 
+            // in the right subtree) 
+            node.data = minValue(node.right);
+
+            // Delete the inorder successor 
+            node.right = delete(node.right, node.data);
         }
 
-        if (data > node.data) {
-            return search(data, node.right);
-        }
+        return node;
+    }
 
-        return null;
+    int minValue(Node node) {
+        int minv = node.data;
+        while (node.left != null) {
+            minv = node.left.data;
+            node = node.left;
+        }
+        return minv;
+    }
+
+    public void deleteNode(Integer data) {
+        delete(this.root, data);
     }
 }
